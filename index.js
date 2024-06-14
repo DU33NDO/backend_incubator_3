@@ -92,7 +92,7 @@ bot.onText(/\/start/, async (msg) => {
   await User.findOneAndUpdate({ chatId }, { chatId }, { upsert: true });
   bot.sendMessage(
     chatId,
-    "Welcome! Type /articles to get the first 5 articles or /random to get a random article."
+    "Welcome! Type /articles to get the first 5 articles."
   );
 });
 
@@ -122,31 +122,8 @@ bot.onText(/\/articles/, async (msg) => {
   }
 });
 
-bot.onText(/\/random/, async (msg) => {
-  const chatId = msg.chat.id;
-  try {
-    const count = await Article.countDocuments();
-    if (count === 0) {
-      bot.sendMessage(chatId, "No articles found in the database.");
-      return;
-    }
-    const randomIndex = Math.floor(Math.random() * count);
-    const randomArticle = await Article.findOne().skip(randomIndex);
-    bot.sendMessage(
-      chatId,
-      `${randomArticle.title}\n${randomArticle.link}\n${randomArticle.description}`
-    );
-  } catch (error) {
-    console.error("Telegram bot error:", error.message);
-    bot.sendMessage(
-      chatId,
-      "An error occurred while fetching a random article."
-    );
-  }
-});
-
 // Cron Job
-cron.schedule("*/20 * * * * *", async () => {
+cron.schedule("0 0 * * *", async () => {
   try {
     const users = await User.find();
     if (users.length === 0) {
